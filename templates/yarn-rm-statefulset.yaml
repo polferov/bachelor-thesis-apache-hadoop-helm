@@ -10,6 +10,10 @@ metadata:
     release: {{ .Release.Name }}
     component: yarn-rm
 spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "hadoop.name" . }}-yarn-rm
+      app.kubernetes.io/instance: {{ .Release.Name }}
   serviceName: {{ include "hadoop.fullname" . }}-yarn-rm
   replicas: 1
   template:

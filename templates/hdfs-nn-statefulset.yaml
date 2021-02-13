@@ -10,6 +10,10 @@ metadata:
     release: {{ .Release.Name }}
     component: hdfs-nn
 spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "hadoop.name" . }}-hdfs-nn
+      app.kubernetes.io/instance: {{ .Release.Name }}
   serviceName: {{ include "hadoop.fullname" . }}-hdfs-nn
   replicas: 1
   template:
