@@ -12,15 +12,16 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "hadoop.name" . }}-yarn-rm
+      app.kubernetes.io/name: {{ include "hadoop.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+      component: yarn-rm
   serviceName: {{ include "hadoop.fullname" . }}-yarn-rm
   replicas: 1
   template:
     metadata:
       labels:
-        app: {{ include "hadoop.name" . }}
-        release: {{ .Release.Name }}
+        app.kubernetes.io/name: {{ include "hadoop.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
         component: yarn-rm
     spec:
       affinity:

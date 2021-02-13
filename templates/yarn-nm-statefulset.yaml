@@ -12,8 +12,9 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "hadoop.name" . }}-yarn-nm
+      app.kubernetes.io/name: {{ include "hadoop.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+      component: yarn-nm
   serviceName: {{ include "hadoop.fullname" . }}-yarn-nm
   replicas: {{ .Values.yarn.nodeManager.replicas }}
 {{- if .Values.yarn.nodeManager.parallelCreate }}
@@ -22,8 +23,8 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ include "hadoop.name" . }}
-        release: {{ .Release.Name }}
+        app.kubernetes.io/name: {{ include "hadoop.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
         component: yarn-nm
     spec:
       affinity:
