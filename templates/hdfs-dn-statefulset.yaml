@@ -60,7 +60,7 @@ spec:
           httpGet:
             path: /
             port: 9864
-          initialDelaySeconds: 5
+          initialDelaySeconds: 60
           timeoutSeconds: 2
         livenessProbe:
           httpGet:
