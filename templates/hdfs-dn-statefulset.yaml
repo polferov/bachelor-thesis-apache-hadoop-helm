@@ -5,16 +5,16 @@ metadata:
   annotations:
     checksum/config: {{ include (print $.Template.BasePath "/hadoop-configmap.yaml") . | sha256sum }}
   labels:
-    app: {{ include "hadoop.name" . }}
-    chart: {{ include "hadoop.chart" . }}
-    release: {{ .Release.Name }}
-    component: hdfs-dn
+    app.kubernetes.io/name: {{ include "hadoop.name" . }}
+    helm.sh/chart: {{ include "hadoop.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: hdfs-dn
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "hadoop.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
-      component: hdfs-dn
+      app.kubernetes.io/component: hdfs-dn
   serviceName: {{ include "hadoop.fullname" . }}-hdfs-dn
   replicas: {{ .Values.hdfs.dataNode.replicas }}
   template:
@@ -22,7 +22,7 @@ spec:
       labels:
         app.kubernetes.io/name: {{ include "hadoop.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
-        component: hdfs-dn
+        app.kubernetes.io/component: hdfs-dn
     spec:
       affinity:
         podAntiAffinity:
@@ -31,9 +31,9 @@ spec:
           - topologyKey: "kubernetes.io/hostname"
             labelSelector:
               matchLabels:
-                app:  {{ include "hadoop.name" . }}
-                release: {{ .Release.Name | quote }}
-                component: hdfs-dn
+                app.kubernetes.io/name: {{ include "hadoop.name" . }}
+                app.kubernetes.io/instance: {{ .Release.Name }}
+                app.kubernetes.io/component: hdfs-dn
         {{- else if eq .Values.antiAffinity "soft" }}
           preferredDuringSchedulingIgnoredDuringExecution:
           - weight: 5
@@ -41,9 +41,9 @@ spec:
               topologyKey: "kubernetes.io/hostname"
               labelSelector:
                 matchLabels:
-                  app:  {{ include "hadoop.name" . }}
-                  release: {{ .Release.Name | quote }}
-                  component: hdfs-dn
+                  app.kubernetes.io/name: {{ include "hadoop.name" . }}
+                  app.kubernetes.io/instance: {{ .Release.Name }}
+                  app.kubernetes.io/component: hdfs-dn
         {{- end }}
       terminationGracePeriodSeconds: 0
       containers:

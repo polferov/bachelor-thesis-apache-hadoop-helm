@@ -3,9 +3,9 @@ kind: ConfigMap
 metadata:
   name: {{ include "hadoop.fullname" . }}
   labels:
-    app: {{ include "hadoop.name" . }}
-    chart: {{ include "hadoop.chart" . }}
-    release: {{ .Release.Name }}
+    app.kubernetes.io/name: {{ include "hadoop.name" . }}
+    helm.sh/chart: {{ include "hadoop.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
 data:
   bootstrap.sh: |
     #!/bin/bash
