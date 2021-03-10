@@ -77,28 +77,28 @@ spec:
       - name: hadoop-config
         configMap:
           name: {{ include "hadoop.fullname" . }}
-    {{- if .Values.persistence.dataNode.enabled }}
-    volumeClaimTemplates:
-    - metadata:
-        name: dfs
-        labels:
-          app.kubernetes.io/name: {{ include "hadoop.name" . }}
-          helm.sh/chart: {{ include "hadoop.chart" . }}
-          app.kubernetes.io/instance: {{ .Release.Name }}
-          app.kubernetes.io/component: hdfs-dn
-      spec:
-        accessModes:
-        - {{ .Values.persistence.dataNode.accessMode | quote }}
-        resources:
-          requests:
-            storage: {{ .Values.persistence.dataNode.size | quote }}
-      {{- if .Values.persistence.dataNode.storageClass }}
-      {{- if (eq "-" .Values.persistence.dataNode.storageClass) }}
-        storageClassName: ""
-      {{- else }}
-        storageClassName: "{{ .Values.persistence.dataNode.storageClass }}"
-      {{- end }}
-      {{- end }}
+      {{- if .Values.persistence.dataNode.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: dfs
+      labels:
+        app.kubernetes.io/name: {{ include "hadoop.name" . }}
+        helm.sh/chart: {{ include "hadoop.chart" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: hdfs-dn
+    spec:
+      accessModes:
+      - {{ .Values.persistence.dataNode.accessMode | quote }}
+      resources:
+        requests:
+          storage: {{ .Values.persistence.dataNode.size | quote }}
+    {{- if .Values.persistence.dataNode.storageClass }}
+    {{- if (eq "-" .Values.persistence.dataNode.storageClass) }}
+      storageClassName: ""
+    {{- else }}
+      storageClassName: "{{ .Values.persistence.dataNode.storageClass }}"
+    {{- end }}
+    {{- end }}
       {{- else }}
       - name: dfs
         emptyDir: {}
