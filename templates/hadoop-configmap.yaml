@@ -41,6 +41,15 @@ data:
     fi
 
     if [[ "${HOSTNAME}" =~ "hdfs-dn" ]]; then
+      # Split hostname at "-" into an array
+      # Example hostname: hadoop-hadoop-hdfs-dn-0
+      HOSTNAME_ARR=(${HOSTNAME//-/ })
+      # Add instance number to start of external port range
+      EXTERNAL_PORT=$(({{ include "hadoop.hdfs.dataNode.externalPortRangeStart" . }} + ${HOSTNAME_ARR[4]}))
+
+      # sed command changing REPLACEME in $HADOOP_PREFIX/etc/hadoop/hdfs-site.xml to actual port number
+      sed -i "s/EXTERNAL_PORT_REPLACEME/${EXTERNAL_PORT}/" $HADOOP_PREFIX/etc/hadoop/hdfs-site.xml
+
       mkdir -p /root/hdfs/datanode
 
       #  wait up to 30 seconds for namenode
@@ -121,7 +130,12 @@ data:
 
       <property>
         <name>dfs.client.use.datanode.hostname</name>
-        <value>false</value>
+        <value>true</value>
+      </property>
+
+      <property>
+        <name>dfs.datanode.hostname</name>
+        <value>{{ include "hadoop.hdfs.dataNode.externalHostname" . }}:EXTERNAL_PORT_REPLACEME</value>
       </property>
 
       <property>
