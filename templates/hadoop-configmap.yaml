@@ -44,11 +44,13 @@ data:
       # Split hostname at "-" into an array
       # Example hostname: hadoop-hadoop-hdfs-dn-0
       HOSTNAME_ARR=(${HOSTNAME//-/ })
-      # Add instance number to start of external port range
-      EXTERNAL_PORT=$(({{ .Values.hdfs.dataNode.externalPortRangeStart }} + ${HOSTNAME_ARR[4]}))
+      # Add instance number to start of external port ranges
+      EXTERNAL_HTTP_PORT=$(({{ .Values.hdfs.dataNode.externalHTTPPortRangeStart }} + ${HOSTNAME_ARR[4]}))
+      EXTERNAL_DATA_PORT=$(({{ .Values.hdfs.dataNode.externalDataPortRangeStart }} + ${HOSTNAME_ARR[4]}))
 
-      # sed command changing REPLACEME in $HADOOP_PREFIX/etc/hadoop/hdfs-site.xml to actual port number
-      sed -i "s/EXTERNAL_PORT_REPLACEME/${EXTERNAL_PORT}/" $HADOOP_PREFIX/etc/hadoop/hdfs-site.xml
+      # sed command changing REPLACEME in $HADOOP_PREFIX/etc/hadoop/hdfs-site.xml to actual port numbers
+      sed -i "s/EXTERNAL_HTTP_PORT_REPLACEME/${EXTERNAL_HTTP_PORT}/" $HADOOP_PREFIX/etc/hadoop/hdfs-site.xml
+      sed -i "s/EXTERNAL_DATA_PORT_REPLACEME/${EXTERNAL_DATA_PORT}/" $HADOOP_PREFIX/etc/hadoop/hdfs-site.xml
 
       mkdir -p /root/hdfs/datanode
 
@@ -135,7 +137,17 @@ data:
 
       <property>
         <name>dfs.datanode.hostname</name>
-        <value>{{ .Values.hdfs.dataNode.externalHostname }}:EXTERNAL_PORT_REPLACEME</value>
+        <value>{{ .Values.hdfs.dataNode.externalHostname }}</value>
+      </property>
+
+      <property>
+        <name>dfs.datanode.http.address</name>
+        <value>0.0.0.0:EXTERNAL_HTTP_PORT_REPLACEME</value>
+      </property>
+
+      <property>
+        <name>dfs.datanode.address</name>
+        <value>0.0.0.0:EXTERNAL_DATA_PORT_REPLACEME</value>
       </property>
 
       <property>
