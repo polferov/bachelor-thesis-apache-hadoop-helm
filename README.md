@@ -1,4 +1,19 @@
-# Hadoop-3.2.1 Chart
+# Hadoop Chart
+
+Build the Docker multi-arch image
+
+```bash
+cd image
+docker buildx build --platform linux/arm64,linux/amd64,linux/arm/v7 -t farberg/apache-hadoop:3.3.2 --push .
+```
+
+helm install --set image.repository=farberg/apache-hadoop --set image.tag=3.3.2 --set hadoopVersion=3.3.2 --set hdfs.dataNode.replicas=3  --set yarn.nodeManager.replicas=2  --set hdfs.webhdfs.enabled=true  my-hadoop-cluster .
+
+
+
+---
+
+
 
 This chart is modified from [stable/hadoop](https://github.com/helm/charts/tree/master/stable/hadoop).
 
