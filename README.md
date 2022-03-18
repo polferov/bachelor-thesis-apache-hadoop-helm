@@ -49,3 +49,31 @@ The following table lists the configurable parameters of the Hadoop chart and th
 | `persistence.dataNode.storageClass`    | Name of the StorageClass to use per your volume provider       | `-`                                                               |
 | `persistence.dataNode.accessMode`      | Access mode for the volume                                     | `ReadWriteOnce`                                                   |
 | `persistence.dataNode.size`            | Size of the volume                                             | `200Gi`                                                           |
+
+
+## Development
+
+Help is always appreciated. Please create pull requests.
+
+### Open Issues
+
+- Include native libraries
+
+### Upload a new version of the chart
+
+```bash
+helm lint
+helm package .
+mv apache-hadoop-helm-*.tgz docs/
+helm repo index docs/ --url https://pfisterer.github.io/apache-hadoop-helm/
+git add docs/
+git commit -a -m "Updated helm repository"
+git push origin master
+```
+
+## Changes
+
+Version 1.2.0
+- Initial release of this chart
+- Use multi-architecture base image
+- Apache Hadoop 3.3.2

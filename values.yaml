@@ -1,6 +1,6 @@
 image:
   repository: farberg/apache-hadoop
-  tag: 3.3.2-nolib
+  tag: 3.3.2
   pullPolicy: IfNotPresent
 
 # The version of the hadoop libraries being used in the image.
