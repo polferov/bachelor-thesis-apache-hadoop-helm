@@ -1,12 +1,11 @@
-# The base hadoop image to use for all components.
-# See this repo for image build details: https://github.com/chenseanxy/helm-hadoop-3/tree/master/image
 image:
-  repository: chenseanxy/hadoop
-  tag: 3.2.1-nolib
+  repository: farberg/apache-hadoop
+  tag: 3.3.2-nolib
   pullPolicy: IfNotPresent
 
 # The version of the hadoop libraries being used in the image.
-hadoopVersion: 3.2.1
+hadoopVersion: 3.3.2
+logLevel: INFO
 
 # Select antiAffinity as either hard or soft, default is soft
 antiAffinity: "soft"
@@ -26,7 +25,7 @@ hdfs:
   dataNode:
     # Will be used as dfs.datanode.hostname
     # You still need to set up services + ingress for every DN
-    # Datanodes will expect to 
+    # Datanodes will expect to
     externalHostname: example.com
     externalDataPortRangeStart: 50500
     externalHTTPPortRangeStart: 51000
@@ -44,7 +43,7 @@ hdfs:
         cpu: "1000m"
 
   webhdfs:
-    enabled: false
+    enabled: true
 
 yarn:
   resourceManager:
@@ -62,7 +61,7 @@ yarn:
     pdbMinAvailable: 1
 
     # The number of YARN NodeManager instances.
-    replicas: 2
+    replicas: 1
 
     # Create statefulsets in parallel (K8S 1.7+)
     parallelCreate: false

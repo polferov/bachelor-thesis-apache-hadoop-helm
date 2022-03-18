@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
 data:
   bootstrap.sh: |
-    #!/bin/bash
+    #!/bin/bash -x
 
     echo Starting
 
@@ -56,7 +56,7 @@ data:
         # Only format if necessary
         $HADOOP_HOME/bin/hdfs namenode -format -force -nonInteractive && echo 1 > /root/hdfs/namenode/formated
       fi
-      $HADOOP_HOME/bin/hdfs --daemon start namenode
+      $HADOOP_HOME/bin/hdfs --loglevel {{ .Values.logLevel }} --daemon start namenode
     fi
 
     # ------------------------------------------------------
@@ -76,18 +76,23 @@ data:
 
       mkdir -p /root/hdfs/datanode
 
-      #  wait up to 30 seconds for namenode
-      (while [[ $count -lt 15 && -z `curl -sf http://{{ include "hadoop.fullname" . }}-hdfs-nn:9870` ]]; do ((count=count+1)) ; echo "Waiting for {{ include "hadoop.fullname" . }}-hdfs-nn" ; sleep 5; done && [[ $count -lt 15 ]])
-      [[ $? -ne 0 ]] && echo "$0: Timeout waiting for hdfs-nn, exiting." && exit 1
-      $HADOOP_HOME/bin/hdfs --daemon start datanode
+      #  Wait (with timeout) for namenode
+      TMP_URL="http://{{ include "hadoop.fullname" . }}-hdfs-nn:9870"
+      if timeout 5m bash -c "until curl -sf $TMP_URL; do echo Waiting for $TMP_URL; sleep 5; done"; then
+        $HADOOP_HOME/bin/hdfs --loglevel {{ .Values.logLevel }} --daemon start datanode
+      else 
+        echo "$0: Timeout waiting for $TMP_URL, exiting."
+        exit 1
+      fi
+
     fi
 
     # ------------------------------------------------------
     # Start RESOURCE MANAGER and PROXY SERVER as daemons
     # ------------------------------------------------------
     if [[ "${HOSTNAME}" =~ "yarn-rm" ]]; then
-      $HADOOP_HOME/bin/yarn --loglevel DEBUG --daemon start resourcemanager
-      $HADOOP_HOME/bin/yarn --daemon start proxyserver
+      $HADOOP_HOME/bin/yarn --loglevel {{ .Values.logLevel }} --daemon start resourcemanager 
+      $HADOOP_HOME/bin/yarn --loglevel {{ .Values.logLevel }} --daemon start proxyserver
     fi
 
     # ------------------------------------------------------
@@ -109,17 +114,20 @@ data:
 
       echo '</configuration>' >> $HADOOP_HOME/etc/hadoop/yarn-site.xml
 
-      #  wait up to 30 seconds for resourcemanager
-      (while [[ $count -lt 15 && -z `curl -sf http://{{ include "hadoop.fullname" . }}-yarn-rm:8088/ws/v1/cluster/info` ]]; do ((count=count+1)) ; echo "$0: Waiting for {{ include "hadoop.fullname" . }}-yarn-rm" ; sleep 2; done && [[ $count -lt 15 ]])
-      [[ $? -ne 0 ]] && echo "$0: Timeout waiting for yarn-rm, exiting." && exit 1
+      # Wait with timeout for resourcemanager
+      TMP_URL="http://{{ include "hadoop.fullname" . }}-yarn-rm:8088/ws/v1/cluster/info"
+      if timeout 5m bash -c "until curl -sf $TMP_URL; do echo Waiting for $TMP_URL; sleep 5; done"; then
+        $HADOOP_HOME/bin/yarn nodemanager --loglevel {{ .Values.logLevel }}
+      else 
+        echo "$0: Timeout waiting for $TMP_URL, exiting."
+        exit 1
+      fi
 
-      $HADOOP_HOME/bin/yarn --loglevel DEBUG start nodemanager
     fi
 
     # ------------------------------------------------------
     # Tail logfiles for daemonized workloads (parameter -d)
     # ------------------------------------------------------
-
     if [[ $1 == "-d" ]]; then
       until find ${HADOOP_HOME}/logs -mmin -1 | egrep -q '.*'; echo "`date`: Waiting for logs..." ; do sleep 2 ; done
       tail -F ${HADOOP_HOME}/logs/* &
@@ -129,7 +137,6 @@ data:
     # ------------------------------------------------------
     # Start bash if requested (parameter -bash)
     # ------------------------------------------------------
-
     if [[ $1 == "-bash" ]]; then
       /bin/bash
     fi

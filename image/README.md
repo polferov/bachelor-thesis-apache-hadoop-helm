@@ -1,30 +1,26 @@
-## Customized Hadoop base image
+# Customized Hadoop Base Image
 
-This image is modified from [comcast/kube-yarn](https://github.com/Comcast/kube-yarn/tree/add-hadoop-image-versions).
+This image is modified from [comcast/kube-yarn](https://github.com/Comcast/kube-yarn/tree/add-hadoop-image-versions) and [mgit-at/helm-hadoop-3](https://github.com/mgit-at/helm-hadoop-3). Currently, native libraries are not been included.
 
-If you want to compile additional native libraries, like [Protobuf](https://wiki.apache.org/hadoop/ProtocolBuffers), you can do so with the provided build targets.
+## Build and Push the Image
 
-This `Makefile` will compile the native libraries and build the latest Hadoop `2.6` and `2.7` docker images for use with the Kubernetes manifests.
+```bash
+# Set version
+HADOOP_VERSION=3.3.2
 
-> Note that there isn't anything really unique about the docker image, as the K8S ConfigMap does most of the boostraping and is designed to work with generic Hadoop docker images.
+# Build
+docker buildx build -t farberg/apache-hadoop:$HADOOP_VERSION
 
-Build Hadoop `2.6` and `2.7` images:
-
-```
-make
-```
-
-Tag and push images to your registry:
-
-```
-DOCKER_REPO=danisla/hadoop make -e tag push
+# Tag and push
+docker tag farberg/apache-hadoop:$HADOOP_VERSION farberg/apache-hadoop:latest
+docker push farberg/apache-hadoop:$HADOOP_VERSION
 ```
 
 ## Testing with minikube
 
 If you are running locally with minikube and want to try your images without pushing them to a registry, build the images on the minikube VM first:
 
-```
+```bash
 eval $(minikube docker-env)
-make && make tag
+# use the build command from above
 ```
