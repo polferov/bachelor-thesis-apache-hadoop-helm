@@ -9,11 +9,7 @@ This image is modified from [comcast/kube-yarn](https://github.com/Comcast/kube-
 HADOOP_VERSION=3.3.2
 
 # Build
-docker buildx build -t farberg/apache-hadoop:$HADOOP_VERSION
-
-# Tag and push
-docker tag farberg/apache-hadoop:$HADOOP_VERSION farberg/apache-hadoop:latest
-docker push farberg/apache-hadoop:$HADOOP_VERSION
+docker buildx build --push --platform "linux/arm64,linux/amd64" -t farberg/apache-hadoop:latest -t farberg/apache-hadoop:$KNOXHADOOP_VERSION_VERSION .
 ```
 
 ## Testing with minikube
