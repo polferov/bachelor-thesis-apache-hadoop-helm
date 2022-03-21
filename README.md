@@ -51,6 +51,33 @@ The following table lists the configurable parameters of the Hadoop chart and th
 | `persistence.dataNode.size`            | Size of the volume                                             | `200Gi`                                                           |
 
 
+---
+
+## Customized Hadoop Base Docker Image
+
+This image is modified from [comcast/kube-yarn](https://github.com/Comcast/kube-yarn/tree/add-hadoop-image-versions) and [mgit-at/helm-hadoop-3](https://github.com/mgit-at/helm-hadoop-3). Currently, native libraries are not been included.
+
+### Build and Push the Docker Image
+
+```bash
+# Set version
+HADOOP_VERSION=3.3.2
+
+# Build
+docker buildx build --push --platform "linux/arm64,linux/amd64" -t farberg/apache-hadoop:latest -t farberg/apache-hadoop:$HADOOP_VERSION .
+```
+
+### Testing with minikube
+
+If you are running locally with minikube and want to try your images without pushing them to a registry, build the images on the minikube VM first:
+
+```bash
+eval $(minikube docker-env)
+# use the build command from above
+```
+
+---
+
 ## Development
 
 Help is always appreciated. Please create pull requests.
@@ -58,13 +85,14 @@ Help is always appreciated. Please create pull requests.
 ### Open Issues
 
 - Include native libraries
+- List of ports needs to be updated (cf. https://www.oreilly.com/library/view/big-data-analytics/9781788628846/5c5821cc-4a3d-498a-a3eb-23256cd79c8b.xhtml)
 
 ### Upload a new version of the chart
 
 ```bash
 helm lint
 helm package .
-mv apache-hadoop-helm-*.tgz docs/
+mv hadoop*.tgz docs/
 helm repo index docs/ --url https://pfisterer.github.io/apache-hadoop-helm/
 git add docs/
 git commit -a -m "Updated helm repository"

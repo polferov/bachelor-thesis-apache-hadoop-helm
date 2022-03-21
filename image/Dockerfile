@@ -1,4 +1,4 @@
-FROM openjdk:8-jre
+FROM openjdk:8-jdk
 
 ENV HADOOP_VERSION 3.3.2
 ENV HADOOP_HOME=/opt/hadoop
