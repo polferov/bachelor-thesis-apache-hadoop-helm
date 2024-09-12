@@ -20,9 +20,12 @@ spec:
   template:
     metadata:
       labels:
+        app: "hadoop-yarn-rm"
         app.kubernetes.io/name: {{ include "hadoop.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: yarn-rm
+      annotations:
+        instrumentation.opentelemetry.io/inject-java: "instrumentation/my-instrumentation"
     spec:
       affinity:
         podAntiAffinity:
@@ -57,6 +60,9 @@ spec:
            - "/bin/bash"
            - "/tmp/hadoop-config/bootstrap.sh"
            - "-d"
+        env:
+          - name: INSPECTIT_PACKAGE_NAME
+            value: org.apache.hadoop
         resources:
 {{ toYaml .Values.yarn.resourceManager.resources | indent 10 }}
         readinessProbe:
